@@ -13,8 +13,7 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.host.url>http://35.154.81.117:9000/</sonar.host.url>
-    <sonar.jdbc.url>jdbc:postgresql://www.example.com/sonar</sonar.jdbc.url>
-    <sonar.jdbc.driver>org.postgresql.Driver</sonar.jdbc.driver>
+        <sonar.jdbc.driver>org.postgresql.Driver</sonar.jdbc.driver>
     <sonar.login>squ_c877c5024afa41122df3e93f781beb56919f0e3f</sonar.login>
     <sonar.exclusions>org/binarytherapy/generated/**/*, **/GuiceBindComposer.java</sonar.exclusions>
     <sonar.dynamic>reuseReports</sonar.dynamic>
