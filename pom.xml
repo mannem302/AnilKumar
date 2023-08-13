@@ -15,7 +15,6 @@
         <sonar.host.url>http://35.154.81.117:9000/</sonar.host.url>
     <sonar.jdbc.url>jdbc:postgresql://www.example.com/sonar</sonar.jdbc.url>
     <sonar.jdbc.driver>org.postgresql.Driver</sonar.jdbc.driver>
-    <sonar.jdbc.username>sonar</sonar.jdbc.username>
     <sonar.login>squ_c877c5024afa41122df3e93f781beb56919f0e3f</sonar.login>
     <sonar.exclusions>org/binarytherapy/generated/**/*, **/GuiceBindComposer.java</sonar.exclusions>
     <sonar.dynamic>reuseReports</sonar.dynamic>
