@@ -12,6 +12,13 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.host.url>http://35.154.81.117:9000/</sonar.host.url>
+    <sonar.jdbc.url>jdbc:postgresql://www.example.com/sonar</sonar.jdbc.url>
+    <sonar.jdbc.driver>org.postgresql.Driver</sonar.jdbc.driver>
+    <sonar.jdbc.username>sonar</sonar.jdbc.username>
+    <sonar.jdbc.password>anil</sonar.jdbc.password>
+    <sonar.exclusions>org/binarytherapy/generated/**/*, **/GuiceBindComposer.java</sonar.exclusions>
+    <sonar.dynamic>reuseReports</sonar.dynamic>
     </properties>
     
     <dependencies>
