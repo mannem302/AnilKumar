@@ -9,13 +9,7 @@
 
     <name>AnilKumar</name>
 
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sonar.host.url>http://13.127.58.24:9000/</sonar.host.url>
-        <sonar.login>squ_1cd2b55ef974cd5694c544a5c26efe9c3f9bfcc3</sonar.login>
-        </properties>
-    
+       
     <dependencies>
         <dependency>
             <groupId>javax</groupId>
