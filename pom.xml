@@ -18,6 +18,12 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.host.url>http://13.232.173.189:9000/</sonar.host.url>
+        <sonar.login>squ_3ec2b519a7595e0724cbd341b9739caf1e6c4d1e</sonar.login>
+        </properties>
 
     <build>
         <plugins>
