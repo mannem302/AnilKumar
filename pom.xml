@@ -29,6 +29,7 @@
         <id>central</id>
         <name>ip-10-0-7-39-releases</name>
         <url>http://13.233.208.117:8081/artifactory/Anilkumar</url>
+        <login>cmVmdGtuOjAxOjE3Mjg5NzE5Nzc6b2wwSEJ0V1BYdVpwZVZRbU1uYjRiNkc4OTVM</login>
     </repository>
     <snapshotRepository>
         <id>snapshots</id>
