@@ -24,6 +24,18 @@
         <sonar.host.url>http://13.232.173.189:9000/</sonar.host.url>
         <sonar.login>squ_9d63663f525a2db72a5958d9e07d35b4a8c92ca1</sonar.login>
         </properties>
+    <distributionManagement>
+    <repository>
+        <id>central</id>
+        <name>ip-10-0-7-39-releases</name>
+        <url>http://13.233.208.117:8081/artifactory/Anilkumar</url>
+    </repository>
+    <snapshotRepository>
+        <id>snapshots</id>
+        <name>ip-10-0-7-39-snapshots</name>
+        <url>http://13.233.208.117:8081/artifactory/Anilkumar</url>
+    </snapshotRepository>
+</distributionManagement>
 
     <build>
         <plugins>
