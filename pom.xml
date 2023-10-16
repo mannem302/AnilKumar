@@ -12,6 +12,12 @@
        
     <dependencies>
         <dependency>
+    <groupId>com</groupId>
+    <artifactId>Mannem</artifactId>
+    <version>AnilKumar</version>
+    <type>l</type>
+     </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>8.0.1</version>
