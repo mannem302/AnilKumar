@@ -2,6 +2,6 @@ FROM tomcat:latest
 
 LABEL maintainer="Anil Kumar"
 
-#ADD ./target/AnilKumar-1.0.war /usr/local/tomcat/webapps/
+ADD ./target/AnilKumar-1.0.war /usr/local/tomcat/webapps/Anil
 
 EXPOSE 8080
