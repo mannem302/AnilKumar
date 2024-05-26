@@ -16,6 +16,11 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
+        stage('Test') {
+            steps {
+                sh 'mvn sonar:sonar'
+            }
+        }
         stage('ImageBuild') {
             steps {
                 sh 'docker build -t mannem302/tomcat:$BUILD_ID .'
