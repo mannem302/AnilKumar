@@ -23,7 +23,10 @@
     <artifactId>maven-plugin-api</artifactId>
     <version>3.9.5</version>
 </dependency>
-
+ <properties> 
+     <sonar.host.url> http://43.205.192.132:9000 </sonar.host.url> 
+     <sonar.login> squ_864acc943533f1cb68582a14a77d99be5bf23b93 </sonar.login> 
+ </properties> 
     </dependencies>
          <build>
         <plugins>
