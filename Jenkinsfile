@@ -26,16 +26,11 @@ pipeline {
                 sh 'docker build -t mannem302/tomcat:$BUILD_ID .'
             }
         }
-        stage('Dockerhublogin') {
-            steps {
-                withCredentials([usernameColonPassword(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-              sh 'docker login'
-        }
-            }
-        }
         stage('Dockerhubpush') {
             steps {
+                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
                 sh 'docker push mannem302/tomcat:$BUILD_ID'
+                }
             }
         }
         stage('RunContainer') {
