@@ -9,7 +9,7 @@
 
     <name>AnilKumar</name>
 <properties> 
-     <sonar.host.url> http://43.205.192.132:9000 </sonar.host.url> 
+     <sonar.host.url> http://3.6.88.34:9000 </sonar.host.url> 
      <sonar.login> squ_864acc943533f1cb68582a14a77d99be5bf23b93 </sonar.login> 
  </properties> 
        
