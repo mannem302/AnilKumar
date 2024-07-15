@@ -8,11 +8,11 @@
     <packaging>war</packaging>
 
     <name>AnilKumar</name>
-<properties> 
-     <sonar.host.url> http://3.6.88.34:9000 </sonar.host.url> 
-     <sonar.login> squ_864acc943533f1cb68582a14a77d99be5bf23b93 </sonar.login> 
- </properties> 
-       
+<properties>
+     <sonar.host.url> http://3.6.88.34:9000 </sonar.host.url>
+     <sonar.login> squ_864acc943533f1cb68582a14a77d99be5bf23b93 </sonar.login>
+ </properties>
+
     <dependencies>
            <dependency>
             <groupId>javax</groupId>
@@ -26,7 +26,13 @@
     <artifactId>maven-plugin-api</artifactId>
     <version>3.9.5</version>
 </dependency>
- 
+<!-- https://mvnrepository.com/artifact/org.opoo.maven/tomcat9-war-runner -->
+<dependency>
+    <groupId>org.opoo.maven</groupId>
+    <artifactId>tomcat9-war-runner</artifactId>
+    <version>3.0.1</version>
+</dependency>
+
     </dependencies>
          <build>
         <plugins>
@@ -41,7 +47,19 @@
                         <endorseddirs>${endorsed.dir}</endorseddirs>
                     </compilerArguments>
                 </configuration>
-            </plugin>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <version>2.2</version>
+            <configuration>
+                <!-- Set the context path (optional) -->
+                <path>/AnilKumar</path>
+                <!-- Specify the Tomcat manager URL -->
+                <url>http://13.233.168.246:8080/manager/text</url>
+                <server>myserver</server>
+            </configuration>
+        </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
