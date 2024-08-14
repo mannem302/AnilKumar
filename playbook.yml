@@ -1,0 +1,48 @@
+---
+- hosts: Prod
+  become: true
+  tasks:
+    - name: Installing git, maven and tomcat softwares for project deployment.
+      apt:
+        name:
+        - git
+        - openjdk-11-jre
+        - maven
+        - tomcat9
+        - tomcat9-admin
+        state: present
+    - name: Tomcat service starting
+      service:
+        name: tomcat9
+        state: started
+    - name: Tomcat service enabling
+      service: 
+        name: tomcat9
+        enabled: yes
+    - name: Now downloading tomcat-users file
+      get_url:
+        url: https://raw.githubusercontent.com/mannem302/download/master/tomcat-users.xml
+        dest: /home/ubuntu
+    - name: Now copying users file to tomcat conf directory
+      copy:
+        src: /home/ubuntu/tomcat-users.xml
+        dest: /var/lib/tomcat9/conf/tomcat-users.xml
+        remote_src: yes
+    - name: Now displaying tomcat username and password
+      debug:
+        msg: Tomcat username is 'tomcat' and password is 'tomcat'
+    - name: Now cloning git repo
+      ansible.builtin.git:
+        repo: 'https://github.com/mannem302/AnilKumar.git'
+        dest: /home/ubuntu/AnilKumar
+        clone: yes
+        update: yes
+    - name: Now building the project
+      shell:
+        cmd: mvn clean package
+        chdir: /home/ubuntu/AnilKumar
+    - name: Now copying the build artifact to tomcat webapps directory
+      copy:
+        src: /home/ubuntu/AnilKumar/target/AnilKumar-1.0.war
+        dest: /var/lib/tomcat9/webapps/Anilkumar.war
+        remote_src: yes
