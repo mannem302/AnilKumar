@@ -10,7 +10,6 @@
         - maven
         - tomcat9
         - tomcat9-admin
-        - curl
         state: present
         update_cache: yes
     - name: Tomcat service starting
