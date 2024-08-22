@@ -38,6 +38,9 @@
         dest: /home/ubuntu/AnilKumar
         clone: yes
         update: yes
+      notify:
+        - Now building the project
+        - Now copying the build artifact to tomcat webapps directory
     - name: Now building the project
       shell:
         cmd: mvn clean package
