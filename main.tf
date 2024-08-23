@@ -101,9 +101,14 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+data "aws_key_pair" "existing" {
+  key_name = "Terraform_Keypair"
+}
+
 # Create an EC2 key pair
 resource "aws_key_pair" "main_key" {
   key_name   = "Terraform_Keypair"
+  count = data.aws_key_pair.existing.id == "" ? 1 : 0
   public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
   tags = {
     Name = "Terraform_Key_Pair"
