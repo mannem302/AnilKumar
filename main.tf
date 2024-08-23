@@ -2,22 +2,26 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-# Data source to check if the key pair exists
+# Data source to check if the keypair exists
 data "aws_key_pair" "existing" {
   key_name = "Terraform_Keypair"
-  # The key name that you want to check
 }
 
-# Null resource to create the key pair only if it doesn't exist
-resource "null_resource" "check_key_pair" {
-  provisioner "local-exec" {
-    command = <<EOT
-    aws ec2 describe-key-pairs --key-name Terraform_Keypair || \
-    aws ec2 import-key-pair --key-name Terraform_Keypair --public-key-material fileb://~/public_keypair.pub
-    EOT
+# Conditionally create a key pair if it doesn't exist
+resource "aws_key_pair" "main_key" {
+  count = length(data.aws_key_pair.existing.id) == 0 ? 1 : 0
+  key_name   = "Terraform_Keypair"  
+  public_key = file("~/.ssh/id_rsa.pub")  # Replace with your actual public key file path
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy = true
+    ignore_changes = [key_name]  # Prevents Terraform from attempting to recreate the key if it already exists
   }
-  triggers = {
-    always_run = "${timestamp()}"
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "echo 'Key pair already exists, skipping creation.'"
   }
 }
 
@@ -104,34 +108,4 @@ resource "aws_security_group" "web_sg" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Web_SG"
-  }
-}
-
-# Launch an EC2 instance in the public subnet
-resource "aws_instance" "public_web" {
-  ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
-  instance_type = "t2.micro"               # Replace with your desired instance type
-  key_name      = "Terraform_Keypair"      # Use the existing key pair
-
-  subnet_id              = aws_subnet.public.id
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
-
-  tags = {
-    Name = "Prod_Server"
-    Env  = "Prod"
-  }
-
-  depends_on = [null_resource.check_key_pair]
-}
+    cidr_blocks = ["0.0.0.0
