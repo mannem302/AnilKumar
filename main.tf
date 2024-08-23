@@ -1,6 +1,28 @@
-# Configure the AWS provider
 provider "aws" {
   region = "ap-south-1"
+}
+
+# Data source to check if the keypair exists
+data "aws_key_pair" "existing" {
+  key_name = "Terraform_Keypair"
+}
+
+# Conditionally create a key pair if it doesn't exist
+resource "aws_key_pair" "main_key" {
+  count = length(data.aws_key_pair.existing.id) == 0 ? 1 : 0
+  key_name   = "Terraform_Keypair"  
+  public_key = file("~/public_keypair.pub")  # Replace with your actual public key file path
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy = true
+    ignore_changes = [key_name]  # Prevents Terraform from attempting to recreate the key if it already exists
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "echo 'Key pair already exists, skipping creation.'"
+  }
 }
 
 # Create a VPC
@@ -101,21 +123,12 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# Create an EC2 key pair
-resource "aws_key_pair" "main_key" {
-  key_name   = "Terraform_Keypair"
-  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
-  tags = {
-    Name = "Terraform_Key_Pair"
-  }
-}
-
 # Launch an EC2 instance in the public subnet
 resource "aws_instance" "public_web" {
   count         = 1
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
-  key_name      = aws_key_pair.main_key.key_name  # Use the created key pair
+  key_name      = "Terraform_Keypair"  # Use the created key pair
 
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
