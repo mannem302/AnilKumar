@@ -1,5 +1,5 @@
 ---
-- hosts: Prod
+- hosts: Dev
   become: true
   tasks:
     - name: Installing git, maven and tomcat softwares for project deployment.
