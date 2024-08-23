@@ -2,12 +2,13 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-# Data source to check if the keypair exists
+# Data source to check if the key pair exists
 data "aws_key_pair" "existing" {
   key_name = "Terraform_Keypair"
+  # The key name that you want to check
 }
 
-# Use a null resource to conditionally create the key pair if it doesn't exist
+# Null resource to create the key pair only if it doesn't exist
 resource "null_resource" "check_key_pair" {
   provisioner "local-exec" {
     command = <<EOT
@@ -15,9 +16,8 @@ resource "null_resource" "check_key_pair" {
     aws ec2 import-key-pair --key-name Terraform_Keypair --public-key-material fileb://~/public_keypair.pub
     EOT
   }
-  # This ensures that the key pair is only created once and not destroyed
-  lifecycle {
-    create_before_destroy = true
+  triggers = {
+    always_run = "${timestamp()}"
   }
 }
 
