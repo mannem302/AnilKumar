@@ -1,4 +1,3 @@
-# Configure the AWS provider
 provider "aws" {
   region = "ap-south-1"
 }
@@ -101,24 +100,24 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+# Data source to check if the keypair exists
 data "aws_key_pair" "existing" {
   key_name = "Terraform_Keypair"
 }
 
-# Create an EC2 key pair
+# Create an EC2 key pair only if it doesn't exist
 resource "aws_key_pair" "main_key" {
-count = length(data.aws_key_pair.existing.id) == 0 ? 1 : 0
-key_name   = "Terraform_Keypair"  
-public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
-lifecycle {
+  count = data.aws_key_pair.existing.id == "" ? 1 : 0
+  key_name   = "Terraform_Keypair"
+  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
+
+  lifecycle {
     prevent_destroy = true
   }
-  
 }
 
 # Launch an EC2 instance in the public subnet
 resource "aws_instance" "public_web" {
-  count         = 1
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
   key_name      = aws_key_pair.main_key.key_name  # Use the created key pair
