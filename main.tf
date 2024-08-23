@@ -11,7 +11,7 @@ data "aws_key_pair" "existing" {
 resource "aws_key_pair" "main_key" {
   count = length(data.aws_key_pair.existing.id) == 0 ? 1 : 0
   key_name   = "Terraform_Keypair"  
-  public_key = file("~/.ssh/id_rsa.pub")  # Replace with your actual public key file path
+  public_key = file("~/public_keypair.pub")  # Replace with your actual public key file path
 
   lifecycle {
     create_before_destroy = true
@@ -108,4 +108,33 @@ resource "aws_security_group" "web_sg" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Web_SG"
+  }
+}
+
+# Launch an EC2 instance in the public subnet
+resource "aws_instance" "public_web" {
+  count         = 1
+  ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
+  instance_type = "t2.micro"               # Replace with your desired instance type
+  key_name      = "Terraform_Keypair"  # Use the created key pair
+
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+
+  tags = {
+    Name = "Prod_Server"
+    Env  = "Prod"
+  }
+}
