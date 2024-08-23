@@ -121,7 +121,7 @@ resource "aws_instance" "public_web" {
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   tags = {
-    Name = "Prod_Server"
-    Env  = "Prod"
+    Name = "Test_Server"
+    Env  = "Test"
   }
 }
