@@ -107,9 +107,12 @@ data "aws_key_pair" "existing" {
 
 # Create an EC2 key pair
 resource "aws_key_pair" "main_key" {
-count = data.aws_key_pair.existing.id == "" ? 1 : 0
+count = length(data.aws_key_pair.existing.id) == 0 ? 1 : 0
 key_name   = "Terraform_Keypair"  
 public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
+lifecycle {
+    prevent_destroy = true
+  }
   
 }
 
