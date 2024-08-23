@@ -2,7 +2,28 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-# Create a VPC
+# Data source to check if the keypair exists
+data "aws_key_pair" "existing" {
+  key_name = "Terraform_Keypair"
+}
+
+# Create an EC2 key pair only if it doesn't exist
+resource "aws_key_pair" "main_key" {
+  key_name   = "Terraform_Keypair"
+  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      public_key, # Ignore changes to the public key to prevent Terraform from attempting to recreate the key pair
+    ]
+  }
+
+  # Skip resource creation if the keypair already exists
+  count = length(data.aws_key_pair.existing.id) > 0 ? 0 : 1
+}
+
+# The rest of your Terraform resources (VPC, Subnets, etc.) remain unchanged
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -12,7 +33,6 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Create a public subnet
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
@@ -23,7 +43,6 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Create a private subnet
 resource "aws_subnet" "private" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
@@ -34,7 +53,6 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Create an Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = {
@@ -42,7 +60,6 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# Create a public route table
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   tags = {
@@ -50,20 +67,17 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Create a route in the public route table
 resource "aws_route" "default_route" {
   route_table_id         = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.igw.id
 }
 
-# Associate the route table with the public subnet
 resource "aws_route_table_association" "public_association" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 
-# Create a private route table
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   tags = {
@@ -71,13 +85,11 @@ resource "aws_route_table" "private" {
   }
 }
 
-# Associate the private route table with the private subnet
 resource "aws_route_table_association" "private_association" {
   subnet_id      = aws_subnet.private.id
   route_table_id = aws_route_table.private.id
 }
 
-# Create a security group for the EC2 instances
 resource "aws_security_group" "web_sg" {
   vpc_id = aws_vpc.main.id
 
@@ -100,27 +112,10 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# Data source to check if the keypair exists
-data "aws_key_pair" "existing" {
-  key_name = "Terraform_Keypair"
-}
-
-# Create an EC2 key pair only if it doesn't exist
-resource "aws_key_pair" "main_key" {
-  count = data.aws_key_pair.existing.id == "" ? 1 : 0
-  key_name   = "Terraform_Keypair"
-  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-# Launch an EC2 instance in the public subnet
 resource "aws_instance" "public_web" {
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
-  key_name      = aws_key_pair.main_key.key_name  # Use the created key pair
+  key_name      = "Terraform_Keypair"      # Use the existing key pair
 
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
