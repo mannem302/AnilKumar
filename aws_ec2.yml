@@ -1,0 +1,26 @@
+plugin: aws_ec2
+regions:
+  - us-east-1
+  - us-east-2
+  - us-west-1
+  - us-west-2
+  - eu-west-1
+  - eu-west-2
+  - eu-west-3
+  - eu-central-1
+  - ap-southeast-1
+  - ap-southeast-2
+  - ap-northeast-1
+  - ap-northeast-2
+  - ap-south-1
+keyed_groups:
+  - key: tags.Env
+    prefix: name_
+  - key: tags.Role
+    prefix: role_
+hostnames:
+  - tag:Env 
+compose:
+  ansible_host: public_ip_address
+filters:
+  instance-state-name: running
