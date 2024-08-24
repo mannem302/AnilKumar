@@ -100,31 +100,28 @@ resource "aws_security_group" "web_sg" {
     Name = "Prod_SG"
   }
 }
-
-# Try to find an existing key pair
+# Attempt to find an existing key pair (this will fail gracefully if it doesn't exist)
 data "aws_key_pair" "existing_key" {
   key_name = "Prod_Keypair"
 
-  # If the key pair doesn't exist, this will allow the data block to return an empty result without failing
-  count = 1
+  # This will cause Terraform to continue without failing if the key pair doesn't exist
   lifecycle {
-    ignore_errors = true
+    ignore_changes = all
   }
 }
 
-# Conditionally create the key pair only if it doesn't exist
+# Conditionally create the key pair if it doesn't exist
 resource "aws_key_pair" "main_key" {
-  count      = data.aws_key_pair.existing_key.id == "" ? 1 : 0
+  count      = length(data.aws_key_pair.existing_key.id) == 0 ? 1 : 0
   key_name   = "Prod_Keypair"
   public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
 }
-
 # Launch an EC2 instance in the public subnet
 resource "aws_instance" "public_web" {
   count         = 1
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
-   key_name = data.aws_key_pair.existing_key.id != "" ? data.aws_key_pair.existing_key.key_name : aws_key_pair.main_key[0].key_name
+  key_name = length(data.aws_key_pair.existing_key.id) > 0 ? data.aws_key_pair.existing_key.key_name : aws_key_pair.main_key[0].key_name
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
