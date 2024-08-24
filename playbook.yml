@@ -41,6 +41,12 @@
       notify:
         - Now building the project
         - Now copying the build artifact to tomcat webapps directory
+    - name: Fetching Server IP address
+     shell: curl ifconfig.me
+     register: myip
+    - name: Displaying Server IP address
+     debug:
+       msg: '{{ myip.stdout }}'
   handlers:  
     - name: Now building the project
       shell:
