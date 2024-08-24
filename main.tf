@@ -1,28 +1,6 @@
+# Configure the AWS provider
 provider "aws" {
   region = "ap-south-1"
-}
-
-# Data source to check if the keypair exists
-data "aws_key_pair" "existing" {
-  key_name = "Terraform_Keypair"
-}
-
-# Conditionally create a key pair if it doesn't exist
-resource "aws_key_pair" "main_key" {
-  count = length(data.aws_key_pair.existing.id) == 0 ? 1 : 0
-  key_name   = "Terraform_Keypair"  
-  public_key = file("~/public_keypair.pub")  # Replace with your actual public key file path
-
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy = true
-    ignore_changes = [key_name]  # Prevents Terraform from attempting to recreate the key if it already exists
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "echo 'Key pair already exists, skipping creation.'"
-  }
 }
 
 # Create a VPC
@@ -31,7 +9,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "Main_VPC"
+    Name = "Prod_VPC"
   }
 }
 
@@ -42,7 +20,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
   availability_zone       = "ap-south-1a"
   tags = {
-    Name = "Public_Subnet"
+    Name = "Prod_Public_Subnet"
   }
 }
 
@@ -53,7 +31,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
   availability_zone       = "ap-south-1a"
   tags = {
-    Name = "Private_Subnet"
+    Name = "Prod_Private_Subnet"
   }
 }
 
@@ -61,7 +39,7 @@ resource "aws_subnet" "private" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "Main_IGW"
+    Name = "Prod_IGW"
   }
 }
 
@@ -69,7 +47,7 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "Public_Route_Table"
+    Name = "Prod_Public_Route_Table"
   }
 }
 
@@ -90,7 +68,7 @@ resource "aws_route_table_association" "public_association" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "Private_Route_Table"
+    Name = "Prod_Private_Route_Table"
   }
 }
 
@@ -119,8 +97,14 @@ resource "aws_security_group" "web_sg" {
   }
 
   tags = {
-    Name = "Web_SG"
+    Name = "Prod_SG"
   }
+}
+
+# Create an EC2 key pair
+resource "aws_key_pair" "main_key" {
+  key_name   = "Prod_Keypair"
+  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
 }
 
 # Launch an EC2 instance in the public subnet
@@ -128,7 +112,7 @@ resource "aws_instance" "public_web" {
   count         = 1
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
-  key_name      = "Terraform_Keypair"  # Use the created key pair
+  key_name      = aws_key_pair.main_key.key_name  # Use the created key pair
 
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
