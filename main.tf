@@ -100,28 +100,31 @@ resource "aws_security_group" "web_sg" {
     Name = "Prod_SG"
   }
 }
-# Attempt to find an existing key pair
-data "aws_key_pair" "existing_key" {
-  key_name = "Prod_Keypair"
-}
 
-# Conditionally create the key pair if it doesn't exist using a local-exec provisioner
-resource "null_resource" "create_keypair" {
-  count = length(data.aws_key_pair.existing_key.id) == 0 ? 1 : 0
+# Create the key pair unconditionally
+resource "aws_key_pair" "main_key" {
+  key_name   = "Prod_Keypair"
+  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
+
+  lifecycle {
+    # Prevent Terraform from trying to recreate the key pair if it already exists
+    create_before_destroy = true
+    prevent_destroy       = true
+  }
 
   provisioner "local-exec" {
-    command = <<EOT
-      aws ec2 import-key-pair --key-name Prod_Keypair --public-key-material fileb://~/public_keypair.pub
-    EOT
+    when    = destroy
+    command = "aws ec2 delete-key-pair --key-name Prod_Keypair"
   }
 }
+
 
 # Launch an EC2 instance in the public subnet
 resource "aws_instance" "public_web" {
   count         = 1
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
-  key_name = length(data.aws_key_pair.existing_key.id) > 0 ? data.aws_key_pair.existing_key.key_name : "Prod_Keypair"
+  key_name = aws_key_pair.main_key.key_name
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
