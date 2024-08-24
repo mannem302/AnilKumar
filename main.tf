@@ -109,7 +109,8 @@ data "external" "check_keypair_exists" {
     else
       echo '{ "exists": false }'
     fi
-  EOT]
+  EOT
+  ]
 }
 
 # Conditionally create the key pair if it doesn't exist
