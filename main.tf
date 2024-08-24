@@ -101,25 +101,10 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# Attempt to find the existing key pair using the AWS CLI
-data "external" "check_keypair_exists" {
-  program = ["bash", "-c", <<EOT
-    if aws ec2 describe-key-pairs --key-names "Prod_Keypair" > /dev/null 2>&1; then
-      echo '{ "exists": true }'
-    else
-      echo '{ "exists": false }'
-    fi
-  EOT
-  ]
-}
-
-# Conditionally create the key pair if it doesn't exist
-resource "null_resource" "create_keypair" {
-  count = data.external.check_keypair_exists.result.exists == "false" ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "aws ec2 import-key-pair --key-name Prod_Keypair --public-key-material fileb://~/public_keypair.pub"
-  }
+# Create an EC2 key pair
+resource "aws_key_pair" "main_key" {
+  key_name   = "Prod_Keypair"
+  public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
 }
 
 # Launch an EC2 instance in the public subnet
@@ -127,7 +112,8 @@ resource "aws_instance" "public_web" {
   count         = 1
   ami           = "ami-0c2af51e265bd5e0e"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
-  key_name = "Prod_Keypair"
+  key_name      = aws_key_pair.main_key.key_name  # Use the created key pair
+
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
