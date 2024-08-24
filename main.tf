@@ -9,7 +9,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "Main_VPC"
+    Name = "Dev_VPC"
   }
 }
 
@@ -20,7 +20,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
   availability_zone       = "ap-south-1a"
   tags = {
-    Name = "Public_Subnet"
+    Name = "Dev_Public_Subnet"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
   availability_zone       = "ap-south-1a"
   tags = {
-    Name = "Private_Subnet"
+    Name = "Dev_Private_Subnet"
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_subnet" "private" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "Main_IGW"
+    Name = "Dev_IGW"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "Public_Route_Table"
+    Name = "Dev_Public_Route_Table"
   }
 }
 
@@ -68,7 +68,7 @@ resource "aws_route_table_association" "public_association" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "Private_Route_Table"
+    Name = "Dev_Private_Route_Table"
   }
 }
 
@@ -97,17 +97,14 @@ resource "aws_security_group" "web_sg" {
   }
 
   tags = {
-    Name = "Web_SG"
+    Name = "Dev_SG"
   }
 }
 
 # Create an EC2 key pair
 resource "aws_key_pair" "main_key" {
-  key_name   = "Terraform_Keypair"
+  key_name   = "Dev_Keypair"
   public_key = file("~/public_keypair.pub")  # Replace with the path to your public key file
-  tags = {
-    Name = "Terraform_Key_Pair"
-  }
 }
 
 # Launch an EC2 instance in the public subnet
