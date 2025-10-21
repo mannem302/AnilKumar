@@ -6,37 +6,14 @@ pipeline {
     } 
    
     stages {
-        stage('GitCodeCheckOut') {
+        stage('GitCloneStage') {
             steps {
                 git branch: 'main', url: 'https://github.com/mannem302/AnilKumar.git'
             }
         }
-        stage('Build') {
+        stage('CodeBuildStage') {
             steps {
                 sh 'mvn clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'mvn sonar:sonar'
-            }
-        }
-        stage('ImageBuild') {
-            steps {
-                sh 'docker build -t mannem302/tomcat:$BUILD_ID .'
-            }
-        }
-        stage('Dockerhubpush') {
-            steps {
-                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                sh 'docker push mannem302/tomcat:$BUILD_ID'
-                }
-            }
-        }
-        stage('RunContainer') {
-            steps {
-                
-                sh 'docker run -itd --name mywebapp$BUILD_ID  -p 8082:8080 mannem302/tomcat:$BUILD_ID'
             }
         }
         
