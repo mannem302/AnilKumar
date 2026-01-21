@@ -9,8 +9,8 @@
 
     <name>AnilKumar</name>
 <properties>
-     <sonar.host.url> http://3.6.88.34:9000 </sonar.host.url>
-     <sonar.login> squ_864acc943533f1cb68582a14a77d99be5bf23b93 </sonar.login>
+     <sonar.host.url> http://13.232.38.121:9000/ </sonar.host.url>
+     <sonar.login> squ_3842d1d42b2d14bfffb3256164df92e6eaa74180 </sonar.login>
  </properties>
 
     <dependencies>
@@ -56,7 +56,7 @@
                 <!-- Set the context path (optional) -->
                 <path>/AnilKumar</path>
                 <!-- Specify the Tomcat manager URL -->
-                <url>http://13.233.168.246:8080/manager/text</url>
+                <url>http://http://65.2.149.13:8080/manager/text</url>
                 <server>myserver</server>
             </configuration>
         </plugin>
